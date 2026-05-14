@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Matemáticas — Aritmética y Geometría</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg1: #0f0c29;
+      --bg2: #302b63;
+      --bg3: #24243e;
+      --accent: #ff6b9d;
+      --accent2: #00d4ff;
+      --accent3: #c471ed;
+      --surface: rgba(255, 255, 255, 0.08);
+      --surface2: rgba(255, 255, 255, 0.12);
+      --text: #f8f5ff;
+      --muted: rgba(248, 245, 255, 0.65);
+      --success: #4ade80;
+      --error: #fb7185;
+      --radius: 20px;
+      --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Outfit", system-ui, sans-serif;
+      min-height: 100vh;
+      color: var(--text);
+      background-color: var(--bg1);
+      background-image:
+        linear-gradient(135deg, rgba(15, 12, 41, 0.72) 0%, rgba(48, 43, 99, 0.62) 45%, rgba(36, 36, 62, 0.78) 100%),
+        url("fondo.png");
+      background-size: cover;
+      background-position: center center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      padding: clamp(1rem, 4vw, 2.5rem);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% -10%, rgba(255, 107, 157, 0.18), transparent),
+        radial-gradient(ellipse 60% 40% at 90% 10%, rgba(0, 212, 255, 0.14), transparent),
+        radial-gradient(ellipse 50% 30% at 50% 100%, rgba(196, 113, 237, 0.12), transparent);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    header h1 {
+      font-size: clamp(1.75rem, 5vw, 2.75rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      background: linear-gradient(90deg, #fff 0%, var(--accent2) 50%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 40px rgba(0, 212, 255, 0.3);
+    }
+
+    header p {
+      margin-top: 0.5rem;
+      color: var(--muted);
+      font-size: 1.05rem;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .tab {
+      border: none;
+      cursor: pointer;
+      padding: 0.75rem 1.35rem;
+      border-radius: 999px;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--muted);
+      background: var(--surface);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: transform 0.2s, box-shadow 0.2s, color 0.2s, background 0.2s;
+    }
+
+    .tab:hover {
+      color: var(--text);
+      transform: translateY(-2px);
+    }
+
+    .tab.active {
+      color: #0f0c29;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      box-shadow: 0 8px 32px rgba(255, 107, 157, 0.35);
+      border-color: transparent;
+    }
+
+    .panel {
+      display: none;
+      animation: fadeIn 0.35s ease;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      background: var(--surface);
+      backdrop-filter: blur(16px);
+      border-radius: var(--radius);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: clamp(1.25rem, 4vw, 2rem);
+      box-shadow: var(--shadow);
+    }
+
+    .card h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 0.35rem;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(0, 0, 0, 0.25);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 1rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--accent2);
+      box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2);
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: flex-end;
+      margin-bottom: 1rem;
+    }
+
+    .field {
+      flex: 1;
+      min-width: 120px;
+    }
+
+    .btn {
+      border: none;
+      cursor: pointer;
+      padding: 0.85rem 1.5rem;
+      border-radius: 12px;
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 1rem;
+      color: #0f0c29;
+      background: linear-gradient(135deg, var(--accent2), #7dd3fc);
+      transition: transform 0.15s, box-shadow 0.2s;
+    }
+
+    .btn:hover {
+      transform: scale(1.02);
+      box-shadow: 0 12px 28px rgba(0, 212, 255, 0.35);
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .result {
+      margin-top: 1.25rem;
+      padding: 1rem 1.25rem;
+      border-radius: 14px;
+      background: var(--surface2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 1.1rem;
+      font-weight: 600;
+      min-height: 3.25rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .result.ok {
+      color: var(--success);
+      border-color: rgba(74, 222, 128, 0.3);
+    }
+
+    .result.err {
+      color: var(--error);
+      border-color: rgba(251, 113, 133, 0.35);
+    }
+
+    .geo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .shape-card {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 16px;
+      padding: 1.25rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .shape-card h3 {
+      font-size: 1.05rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.65rem;
+      border-bottom: 2px solid transparent;
+      border-image: linear-gradient(90deg, var(--accent2), var(--accent3)) 1;
+    }
+
+    .shape-card .btn {
+      width: 100%;
+      margin-top: 0.75rem;
+      font-size: 0.9rem;
+      padding: 0.65rem;
+    }
+
+    .shape-result {
+      margin-top: 0.75rem;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+
+    .shape-result strong {
+      color: var(--accent2);
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Matemáticas en vivo</h1>
+      <p>Operaciones básicas y figuras geométricas con un solo clic</p>
+    </header>
+
+    <div class="tabs" role="tablist">
+      <button type="button" class="tab active" data-tab="aritmetica" role="tab" aria-selected="true">Aritmética</button>
+      <button type="button" class="tab" data-tab="geometria" role="tab" aria-selected="false">Geometría</button>
+    </div>
+
+    <section id="panel-aritmetica" class="panel active" role="tabpanel">
+      <div class="card">
+        <h2>Operaciones</h2>
+        <div class="row">
+          <div class="field">
+            <label for="n1">Primer número</label>
+            <input type="number" id="n1" step="any" placeholder="0" />
+          </div>
+          <div class="field" style="flex: 0 0 auto; min-width: 140px;">
+            <label for="op">Operación</label>
+            <select id="op">
+              <option value="+">Suma (+)</option>
+              <option value="-">Resta (−)</option>
+              <option value="*">Multiplicación (×)</option>
+              <option value="/">División (÷)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="n2">Segundo número</label>
+            <input type="number" id="n2" step="any" placeholder="0" />
+          </div>
+          <button type="button" class="btn" id="btn-calc">Calcular</button>
+        </div>
+        <div id="arith-result" class="result" aria-live="polite">Introduce números y pulsa Calcular.</div>
+      </div>
+    </section>
+
+    <section id="panel-geometria" class="panel" role="tabpanel" hidden>
+      <div class="card">
+        <h2>Área y perímetro</h2>
+        <div class="geo-grid">
+          <div class="shape-card">
+            <h3>Círculo</h3>
+            <label for="r-circulo">Radio (r)</label>
+            <input type="number" id="r-circulo" min="0" step="any" placeholder="Ej. 5" />
+            <button type="button" class="btn btn-geo" data-shape="circulo">Calcular</button>
+            <div class="shape-result" id="out-circulo"></div>
+          </div>
+          <div class="shape-card">
+            <h3>Cuadrado</h3>
+            <label for="l-cuadrado">Lado (L)</label>
+            <input type="number" id="l-cuadrado" min="0" step="any" placeholder="Ej. 4" />
+            <button type="button" class="btn btn-geo" data-shape="cuadrado">Calcular</button>
+            <div class="shape-result" id="out-cuadrado"></div>
+          </div>
+          <div class="shape-card">
+            <h3>Rectángulo</h3>
+            <div class="grid-2">
+              <div>
+                <label for="base-rect">Base (b)</label>
+                <input type="number" id="base-rect" min="0" step="any" />
+              </div>
+              <div>
+                <label for="alt-rect">Altura (h)</label>
+                <input type="number" id="alt-rect" min="0" step="any" />
+              </div>
+            </div>
+            <button type="button" class="btn btn-geo" data-shape="rectangulo">Calcular</button>
+            <div class="shape-result" id="out-rectangulo"></div>
+          </div>
+          <div class="shape-card">
+            <h3>Triángulo</h3>
+            <p style="font-size: 0.8rem; color: var(--muted); margin-bottom: 0.75rem;">Tres lados (área con fórmula de Herón)</p>
+            <div class="grid-2">
+              <div>
+                <label for="a-tri">Lado a</label>
+                <input type="number" id="a-tri" min="0" step="any" />
+              </div>
+              <div>
+                <label for="b-tri">Lado b</label>
+                <input type="number" id="b-tri" min="0" step="any" />
+              </div>
+              <div style="grid-column: 1 / -1;">
+                <label for="c-tri">Lado c</label>
+                <input type="number" id="c-tri" min="0" step="any" />
+              </div>
+            </div>
+            <button type="button" class="btn btn-geo" data-shape="triangulo">Calcular</button>
+            <div class="shape-result" id="out-triangulo"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>Usa números positivos para medidas. π ≈ 3.14159…</footer>
+  </div>
+
+  <script>
+    (function () {
+      const tabs = document.querySelectorAll(".tab");
+      const panels = {
+        aritmetica: document.getElementById("panel-aritmetica"),
+        geometria: document.getElementById("panel-geometria"),
+      };
+
+      tabs.forEach(function (tab) {
+        tab.addEventListener("click", function () {
+          const id = tab.getAttribute("data-tab");
+          tabs.forEach(function (t) {
+            t.classList.toggle("active", t === tab);
+            t.setAttribute("aria-selected", t === tab ? "true" : "false");
+          });
+          Object.keys(panels).forEach(function (key) {
+            const p = panels[key];
+            const on = key === id;
+            p.classList.toggle("active", on);
+            p.hidden = !on;
+          });
+        });
+      });
+
+      function setResult(el, text, kind) {
+        el.textContent = text;
+        el.classList.remove("ok", "err");
+        if (kind) el.classList.add(kind);
+      }
+
+      document.getElementById("btn-calc").addEventListener("click", function () {
+        const el = document.getElementById("arith-result");
+        const a = parseFloat(document.getElementById("n1").value);
+        const b = parseFloat(document.getElementById("n2").value);
+        const op = document.getElementById("op").value;
+
+        if (Number.isNaN(a) || Number.isNaN(b)) {
+          setResult(el, "Escribe números válidos en ambos campos.", "err");
+          return;
+        }
+
+        var result;
+        switch (op) {
+          case "+":
+            result = a + b;
+            break;
+          case "-":
+            result = a - b;
+            break;
+          case "*":
+            result = a * b;
+            break;
+          case "/":
+            if (b === 0) {
+              setResult(el, "No se puede dividir entre cero.", "err");
+              return;
+            }
+            result = a / b;
+            break;
+          default:
+            setResult(el, "Operación no válida.", "err");
+            return;
+        }
+
+        var label = { "+": "Suma", "-": "Resta", "*": "Producto", "/": "Cociente" }[op];
+        var pretty = Number.isInteger(result) ? String(result) : String(Math.round(result * 1e8) / 1e8);
+        setResult(el, label + ": " + pretty, "ok");
+      });
+
+      function readPositive(id, allowZero) {
+        var v = parseFloat(document.getElementById(id).value);
+        if (Number.isNaN(v)) return { ok: false, msg: "Introduce un número válido." };
+        if (v < 0) return { ok: false, msg: "Las medidas no pueden ser negativas." };
+        if (!allowZero && v === 0) return { ok: false, msg: "El valor debe ser mayor que cero." };
+        return { ok: true, v: v };
+      }
+
+      function triangleValid(a, b, c) {
+        return a + b > c && a + c > b && b + c > a;
+      }
+
+      document.querySelectorAll(".btn-geo").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var shape = btn.getAttribute("data-shape");
+          var PI = Math.PI;
+
+          if (shape === "circulo") {
+            var r = readPositive("r-circulo", true);
+            var out = document.getElementById("out-circulo");
+            if (!r.ok) {
+              out.innerHTML = r.msg;
+              return;
+            }
+            if (r.v === 0) {
+              out.innerHTML = "Radio 0: área y perímetro son 0.";
+              return;
+            }
+            var area = PI * r.v * r.v;
+            var per = 2 * PI * r.v;
+            out.innerHTML =
+              "<strong>Área:</strong> " +
+              area.toFixed(4) +
+              " u²<br><strong>Perímetro (circunferencia):</strong> " +
+              per.toFixed(4) +
+              " u";
+            return;
+          }
+
+          if (shape === "cuadrado") {
+            var L = readPositive("l-cuadrado", true);
+            var outSq = document.getElementById("out-cuadrado");
+            if (!L.ok) {
+              outSq.innerHTML = L.msg;
+              return;
+            }
+            if (L.v === 0) {
+              outSq.innerHTML = "Lado 0: área y perímetro son 0.";
+              return;
+            }
+            outSq.innerHTML =
+              "<strong>Área:</strong> " +
+              (L.v * L.v).toFixed(4) +
+              " u²<br><strong>Perímetro:</strong> " +
+              (4 * L.v).toFixed(4) +
+              " u";
+            return;
+          }
+
+          if (shape === "rectangulo") {
+            var b = readPositive("base-rect", true);
+            var h = readPositive("alt-rect", true);
+            var outR = document.getElementById("out-rectangulo");
+            if (!b.ok) {
+              outR.innerHTML = b.msg;
+              return;
+            }
+            if (!h.ok) {
+              outR.innerHTML = h.msg;
+              return;
+            }
+            if (b.v === 0 || h.v === 0) {
+              outR.innerHTML = "Si base o altura es 0, el área es 0; el perímetro es " + (2 * (b.v + h.v)).toFixed(4) + " u.";
+              return;
+            }
+            outR.innerHTML =
+              "<strong>Área:</strong> " +
+              (b.v * h.v).toFixed(4) +
+              " u²<br><strong>Perímetro:</strong> " +
+              (2 * (b.v + h.v)).toFixed(4) +
+              " u";
+            return;
+          }
+
+          if (shape === "triangulo") {
+            var sa = readPositive("a-tri", true);
+            var sb = readPositive("b-tri", true);
+            var sc = readPositive("c-tri", true);
+            var outT = document.getElementById("out-triangulo");
+            if (!sa.ok || !sb.ok || !sc.ok) {
+              outT.innerHTML = "Escribe números válidos en los tres lados.";
+              return;
+            }
+            var a = sa.v;
+            var b2 = sb.v;
+            var c = sc.v;
+            if (a === 0 || b2 === 0 || c === 0) {
+              outT.innerHTML = "Los lados deben ser mayores que cero para un triángulo.";
+              return;
+            }
+            if (!triangleValid(a, b2, c)) {
+              outT.innerHTML = "Esos tres lados no forman un triángulo (desigualdad triangular).";
+              return;
+            }
+            var perT = a + b2 + c;
+            var s = perT / 2;
+            var areaT = Math.sqrt(s * (s - a) * (s - b2) * (s - c));
+            outT.innerHTML =
+              "<strong>Perímetro:</strong> " +
+              perT.toFixed(4) +
+              " u<br><strong>Área (Herón):</strong> " +
+              areaT.toFixed(4) +
+              " u²";
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
